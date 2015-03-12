@@ -1,44 +1,59 @@
 import tools.tools
+import tools.log
 import requests
-import film
+import database.film as film
+import itertools
+
 import json
+import time
+import random
 
-def getAllFilms():
+class FilmImportError(Exception):
+    pass
 
-    strings  = tools.tools.get2letterString()
-    it = len(strings)/100
-    incr = 0
-    percent = 0
-    films = list()
-    print_s = '\rgetting IMdB database:  {0}%'
-
-    print print_s.format(0)
-    for i in strings:
-        print '\rgetting IMdB database:{1}  {0}%     so far {2} films'.format(percent,i,len(films))
-        incr += 1
-        films += getFilmsWith(i)
-        if incr > it :
-            incr = 0
-            percent += 1
+log = tools.log.get_log("imdb")
 
 
 
 def getFilmsWith(string):
-    films = list()
+    _films = list()
     try:
-        command = 'http://www.omdbapi.com/?s={0}&y=&plot=short&r=json'.format(string)
+        command = 'http://www.omdbapi.com/?s={0}&y=&plot=short&r=json&plot=full,tomatoes=true'.format(string)
         r = requests.get(command)
         jsonstring =  r.text
         jsonstring = json.loads(jsonstring)
 
         for i in jsonstring["Search"]:
                 _film = film.film(i)
-                films.append(film)
-    except:
-        pass
-    return films
+                _films.append(_film)
+    except Exception as e :
+        print (e)
+
+    return _films
 
 
+
+def getAllIndex():
+    indexes = list()
+    for i in itertools.combinations(["0","1","2","3","4","5","6","7","8","9"],7):
+        indexes.append("tt"+"".join(i))
+    return indexes
+
+
+
+
+def getFilmById(ide):
+    try:
+        command = 'http://www.omdbapi.com/?i={0}&y=&plot=short&r=json&plot=full&tomatoes=true'.format(ide)
+        print (command)
+        r = requests.get(command)
+        jsonstring =  r.text
+
+        jsonstring = json.loads(jsonstring)
+        _film = film.film(jsonstring)
+
+    except Exception as e :
+        print (e)
 
 
 

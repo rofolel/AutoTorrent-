@@ -1,28 +1,28 @@
 from threading import Thread
-from Queue import Queue
-
+from queue import Queue
+import tools.log as log
 class worker(Thread):
-
+    log = log.get_log("Taskforce")
     class work(object):
         def __init__(self,funct,args):
             self.funct = funct
             self.args = args
         def execute(self):
-            self.function(*self.args)
+            self.funct(*self.args)
 
-    work_queue = Queue()
-    workers  = list()
+    tasks = Queue()
+    taskforce  = list()
     @classmethod
     def todo(cls,task,args=[]):
-        worker.work_queue.put(worker.work(task,args))
+        worker.tasks.put(worker.work(task,args))
 
     @classmethod
     def addWorker(cls):
-        worker.workers.append(worker().start())
+        worker.taskforce.append(worker().start())
 
     @classmethod
     def removeWorker(cls):
-        worker.work_queue.put("stopstop")
+        worker.tasks.put("stopstop")
 
 
 
@@ -31,15 +31,13 @@ class worker(Thread):
     def run(self):
 
         while True:
-            work = worker.work_queue.get()
-            print work
-            if work == "stopstop":
-                print "Thread stoped"
-                worker.workers.remove(self)
+            work = worker.tasks.get()
+            if work.funct == "stopstop":
                 break
             try:
-                assert isinstance(work,worker.work)
                 work.execute()
             except Exception as e :
-                print e
+                worker.log.warning(str(e))
 
+
+        worker.taskforce.remove(self)

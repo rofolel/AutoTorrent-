@@ -1,9 +1,6 @@
 import string
+import itertools
 def get2letterString():
     strings = list()
     allTheLetters = string.lowercase
-    for first in allTheLetters:
-        for second in allTheLetters:
-            strings.append('%s%s'%(first,second))
-
-    return strings
+    return itertools.combinations(allTheLetters,4)
