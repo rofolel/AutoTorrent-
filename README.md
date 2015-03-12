@@ -9,4 +9,8 @@ django1.7
 
 Install:
 
+python manage.py makemigrations autotorrent
+python manage.py sqlmigrate autotorrent 0001
 python manage.py migrate
+
+python manage.py createsuperuser

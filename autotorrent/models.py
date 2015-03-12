@@ -1,9 +1,13 @@
 from django.db import models
 
+
+class actor(models.Model):
+    name = models.TextField()
+
 class film(models.Model):
 
     director = models.TextField()
-    actors = models.ManyToOneRel()
+    actors = models.ManyToManyField(actor)
     year = models.DateField()
     imdbrating = models.IntegerField()
     imdbID = models.TextField()
@@ -14,14 +18,19 @@ class film(models.Model):
 class serie(film):
     pass
 
-class actor(models.Model):
-    name = models.TextField()
-
 
 class episode(models.Model):
     date = models.DateField()
     season = models.IntegerField()
     episode = models.IntegerField()
+    serie = models.ForeignKey(serie)
+
+
+
+
+
+
+
 
 
 
