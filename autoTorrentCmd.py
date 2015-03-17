@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import cmd
+import os
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
+
+from django.core.wsgi import get_wsgi_application
+
+application = get_wsgi_application()
 import motherShip.motherShip as motherShip
 
 class bcolors:
@@ -47,14 +53,6 @@ class autoTorrentCmd(cmd.Cmd):
         self.mothership = motherShip.motherShip()
 
 
-    def do_loadFilmdb(self,line):
-        self.mothership.loadFilmDB()
-
-    def do_number(self,l):
-        print( len(self.mothership.films))
-
-    def do_load(self,line):
-        self.mothership.loadFilm(line)
 
 
     def do_exit(self,line):
@@ -64,18 +62,23 @@ class autoTorrentCmd(cmd.Cmd):
             print( "stop")
             tools.taskforce.worker.todo('stopstop')
         sys.exit(0)
-    def do_search(self,line):
-        print ("lol")
-    def complete_search(self, text, line, begidx, endidx):
-        _line = line.replace("search ","").lower()
-        filmnames = []
 
-        for i in self.mothership.films:
-            filmnames.append(i.lower())
-        return [i for i in filmnames if i.startswith(_line)]
+    def do_loadIMDB(self, line):
+        self.mothership.loadFilmDB()
+
 
     def do_loadID(self,line):
         self.mothership.loadID(line)
+
+    def do_list(self, line):
+        self.mothership.loadData()
+        print('film')
+        for i in self.mothership.films:
+            print(i.title)
+        print('serie')
+        for i in self.mothership.series:
+            print(i.title)
+
 
 cm = autoTorrentCmd()
 cm.cmdloop()

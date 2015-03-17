@@ -3,7 +3,8 @@ Server to automatically download new films and series using torrents. Based on P
 
 dependencies : 
 django1.7
-
+shifter 
+transmission
 
 
 
