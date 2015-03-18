@@ -2,7 +2,7 @@ import random
 import json
 import time
 from datetime import datetime
-
+from math import floor, ceil
 import requests
 
 import tools.tools
@@ -16,14 +16,12 @@ class FilmImportError(Exception):
 log = tools.log.get_log("imdb")
 
 
-
-
-
-
-def getAllIndex():
+def getAllIndex(incr,div):
     indexes = list()
-    for i in range(0, 99999999):
-        indexes.append("tt" + str(i).zfill(8))
+    min = (99999999/div)*incr
+    max = (99999999/div)*(incr+1)
+    for i in range(floor(min),ceil(max)):
+        indexes.append("tt"+str(i).zfill(8))
     random.shuffle(indexes)
     return indexes
 
@@ -31,34 +29,33 @@ def getAllIndex():
 
 
 def getFilmById(ide):
-    print(ide)
-    if models.film.objects.all().filter(imdbID=ide):
-        return
-    command = 'http://www.omdbapi.com/?i={0}&y=&plot=short&r=json&plot=full'.format(ide)
+        if models.film.objects.all().filter(imdbID=ide):
+            return
+        command = 'http://www.omdbapi.com/?i={0}&y=&plot=short&r=json&plot=full'.format(ide)
         r = requests.get(command)
-    jsonstring = r.text.replace("N/A", "")
-    if 'Error' in jsonstring:
-        return
-    filmdic = json.loads(jsonstring)
+        jsonstring =  r.text.replace("N/A" , "")
+        if 'Error' in jsonstring:
+            return
+        filmdic = json.loads(jsonstring)
 
-    if filmdic["Type"] == "movie":
-        _film = loadFilm(filmdic)
-    elif filmdic["Type"] == 'series':
-        _film = loadSerie(filmdic)
-    elif filmdic["Type"] == 'serie':
-        _film = loadSerie(filmdic)
-    else:
-        _film = loadEpisode(filmdic)
-    _film.save()
-    actors = filmdic["Actors"].split(',')
-    for act in actors:
-        _actor = loadActor(act)
-        _actor.save()
-        _film.actors.add(_actor)
-    print('added %s' % (_film.title))
-    _film.save()
-    time.sleep(random.randint(0, 5) / 7)
 
+        if filmdic["Type"] == "movie":
+            _film = loadFilm(filmdic)
+        elif filmdic["Type"] == 'series' :
+            _film = loadSerie(filmdic)
+        elif filmdic["Type"] == 'serie' :
+            _film = loadSerie(filmdic)
+        else:
+            _film = loadEpisode(filmdic)
+        _film.save()
+        actors = filmdic["Actors"].split(',')
+        for act in actors:
+            _actor = loadActor(act)
+            _actor.save()
+            _film.actors.add(_actor)
+        print ('added %s'%(_film.title))
+        _film.save()
+        time.sleep(random.randint(0,5)/7)
 
 def loadActor(actor):
     actor = actor.strip()
@@ -71,46 +68,47 @@ def loadActor(actor):
         return act
 
 
+
+
+
 def loadFilm(filmdic):
-    _film = models.film()
-    _film.title = filmdic['Title']
-    _film.director = filmdic['Director']
-    _film.imdbID = filmdic['imdbID']
-    try:
-        _film.imdbrating = filmdic['imdbRating']
-    except:
-        _film.imdbrating = None
-        pass
+        _film = models.film()
+        _film.title = filmdic['Title']
+        _film.director = filmdic['Director']
+        _film.imdbID = filmdic['imdbID']
+        try:
+            _film.imdbrating = filmdic['imdbRating']
+        except:
+            _film.imdbrating = None
+            pass
 
-    try:
-        _film.year = datetime.strptime(filmdic['Year'], "%Y")
-    except:
-        _film.year = None
-        pass
-    _film.genre = filmdic['Genre']
-    _film.plot = filmdic['Plot']
-    return _film
-
+        try:
+            _film.year = datetime.strptime( filmdic['Year'],"%Y")
+        except:
+            _film.year = None
+            pass
+        _film.genre = filmdic['Genre']
+        _film.plot = filmdic['Plot']
+        return _film
 
 def loadSerie(filmdic):
-    _serie = models.serie()
-    _serie.title = filmdic['Title']
-    _serie.director = filmdic['Director']
-    _serie.imdbID = filmdic['imdbID']
-    try:
-        _serie.imdbrating = filmdic['imdbRating']
-    except:
-        _serie.imdbrating = None
-        pass
-    try:
-        _serie.year = datetime.strptime(filmdic['Year'], "%Y")
-    except:
-        _serie.year = None
-        pass
-    _serie.genre = filmdic['Genre']
-    _serie.plot = filmdic['Plot']
-    return _serie
-
+        _serie = models.serie()
+        _serie.title = filmdic['Title']
+        _serie.director = filmdic['Director']
+        _serie.imdbID = filmdic['imdbID']
+        try:
+            _serie.imdbrating = filmdic['imdbRating']
+        except:
+            _serie.imdbrating = None
+            pass
+        try:
+            _serie.year = datetime.strptime( filmdic['Year'],"%Y")
+        except:
+            _serie.year = None
+            pass
+        _serie.genre = filmdic['Genre']
+        _serie.plot = filmdic['Plot']
+        return _serie
 
 def loadEpisode(filmdic):
     _episode = models.episode()
@@ -125,7 +123,7 @@ def loadEpisode(filmdic):
     else:
         return
     try:
-        _episode.date = datetime.strptime(filmdic['Released'], "%d %b %Y").strftime("%Y-%m-%d")
+        _episode.date = datetime.strptime(filmdic['Released'],"%d %b %Y").strftime("%Y-%m-%d")
     except:
         _episode.date = None
 

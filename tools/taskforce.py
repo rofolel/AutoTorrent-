@@ -1,6 +1,7 @@
 from threading import Thread
 from queue import Queue
 import tools.log as log
+import time
 class worker(Thread):
     log = log.get_log("Taskforce")
     class work(object):
@@ -13,7 +14,7 @@ class worker(Thread):
     tasks = Queue()
     taskforce  = list()
     @classmethod
-    def todo(cls,task,args=[]):
+    def todo(cls,task,args=[],wait=0):
         worker.tasks.put(worker.work(task,args))
 
     @classmethod

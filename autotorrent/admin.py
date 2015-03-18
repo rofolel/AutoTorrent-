@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from autotorrent.models import episode, film, serie, actor
+from autotorrent.models import episode, film,serie,actor
 
 
 admin.site.register(episode)

@@ -2,11 +2,9 @@
 # -*- coding: utf-8 -*-
 import cmd
 import os
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE","server.settings")
 
 from django.core.wsgi import get_wsgi_application
-
 application = get_wsgi_application()
 import motherShip.motherShip as motherShip
 
@@ -63,22 +61,22 @@ class autoTorrentCmd(cmd.Cmd):
             tools.taskforce.worker.todo('stopstop')
         sys.exit(0)
 
-    def do_loadIMDB(self, line):
+    def do_loadIMDB(self,line):
         self.mothership.loadFilmDB()
+
 
 
     def do_loadID(self,line):
         self.mothership.loadID(line)
-
-    def do_list(self, line):
+    def do_list(self,line):
         self.mothership.loadData()
-        print('film')
-        for i in self.mothership.films:
+        print ('film')
+        for i in self.mothership.films :
             print(i.title)
-        print('serie')
+        print ('serie')
         for i in self.mothership.series:
             print(i.title)
-
-
+    def do_workload(self,ea):
+        self.mothership.workload()
 cm = autoTorrentCmd()
 cm.cmdloop()
